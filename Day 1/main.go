@@ -12,13 +12,11 @@ import (
 func main() {
 
 	val := make([]int, 200)
-
-	//val := []int { 1721,979, 366, 299,	675, 1456}
-
-	f, err := os.Open("inputTask1")
+	f, err := os.Open("Day 1/inputTask1")
 	if err != nil {
 		panic(err)
 	}
+
 	file := bufio.NewScanner(f)
 
 	index := 0
