@@ -43,20 +43,11 @@ func main() {
 		}
 
 		//Calculating part 2
-		if password[min-1] == letter && password[max-1] == letter {
-			continue
-		}
 		if password[min-1] != letter && password[max-1] == letter {
 			validPart2++
-		}
-		if password[min-1] == letter && password[max-1] != letter {
+		} else if password[min-1] == letter && password[max-1] != letter {
 			validPart2++
 		}
-		if password[min-1] != letter && password[max-1] != letter {
-			continue
-		}
-
-
 	}
 	fmt.Println("Part 1 valid passwords:", validPart1)
 	fmt.Println("Part 2 valid passwords:", validPart2)
