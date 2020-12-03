@@ -20,46 +20,36 @@ func main() {
 		line := file.Text()
 		pattern = append(pattern, []rune(line))
 	}
-	length := len(pattern[0])
-	val1 := 0
-	val2 := 0
-	val3 := 0
-	val4 := 0
-	val5 := 0
+	row_length := len(pattern[0])
+	array_length := len(pattern)
 
-	row1 := 0
-	row2 := 0
-	row3 := 0
-	row4 := 0
+	// Move set
+	right_moves := []int {3, 1, 5, 7, 1}
+	down_moves :=  []int {1, 1, 1, 1, 2}
 
+
+	total_moves := len(right_moves)
+	row_indexes := make([]int, total_moves)
+	column_indexes := make([]int, total_moves)
+	val := make([]int, total_moves)
+
+	fmt.Println("Calculating part 1 and 2")
 	t := time.Now()
-	for i := 0; i < len(pattern); i++ { // 1 Down
-		if pattern[i][i % length] == '#' {
-			val1++
+	for i := 0; i < array_length; i++ {
+		for j := 0; j < total_moves; j++ {
+			if row_indexes[j] <= array_length && pattern[row_indexes[j]][column_indexes[j] % row_length] == '#' {
+				val[j]++
+			}
+			row_indexes[j] += down_moves[j]
+			column_indexes[j]  += right_moves[j]
 		}
-		if pattern[i][row1 % length] == '#' {
-			val2++
-		}
-		if pattern[i][row2 % length] == '#' {
-			val3++
-		}
-		if pattern[i][row3 % length] == '#' {
-			val4++
-		}
-		row1 += 3
-		row2 += 5
-		row3 += 7
 	}
 
-
-	for i := 0; i < len(pattern); i+=2 { // 2 Down
-		if pattern[i][row4 % length] == '#' {
-			val5++
-		}
-		row4++
+	total := 1
+	for _, item := range val {
+		total *= item
 	}
-
+	fmt.Println("Part 1 answer:", val[0])
+	fmt.Println("Part 2 answer:", total)
 	fmt.Println("Time taken:",time.Now().Sub(t))
-	fmt.Println("Part 1 answer:", val1)
-	fmt.Println("Part 2 answer:", val1*val2*val3*val4*val5)
 }
