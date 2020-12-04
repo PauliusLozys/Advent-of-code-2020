@@ -18,18 +18,18 @@ func main() {
 		panic(err)
 	}
 	attributes_must := []string { "byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"}
-	attributes_optional := []string { "cid" }
 
 	validPassportsPart1 := 0
 	validPassportsPart2 := 0
 	file := bufio.NewScanner(f)
 	stringBuffer := bytes.Buffer{}
+
 	t := time.Now()
 	for file.Scan() {
 		line := file.Text()
 		if line == ""{
 			// Validate string
-			validatePassword(stringBuffer, &validPassportsPart1, &validPassportsPart2, attributes_must, attributes_optional)
+			validatePassword(stringBuffer, &validPassportsPart1, &validPassportsPart2, attributes_must)
 			stringBuffer.Reset()
 		} else {
 			stringBuffer.WriteString(line)
@@ -38,7 +38,7 @@ func main() {
 	}
 
 	if stringBuffer.Len() != 0 { // Need to parse the last entry
-		validatePassword(stringBuffer, &validPassportsPart1, &validPassportsPart2, attributes_must, attributes_optional)
+		validatePassword(stringBuffer, &validPassportsPart1, &validPassportsPart2, attributes_must)
 		stringBuffer.Reset()
 	}
 
@@ -47,12 +47,12 @@ func main() {
 	fmt.Println("Time taken:", time.Now().Sub(t))
 }
 
-func validatePassword(stringBuffer bytes.Buffer, validPasswordCounter1, validPasswordCounter2 *int, attributes_must, attributes_optional []string){
+func validatePassword(stringBuffer bytes.Buffer, validPasswordCounter1, validPasswordCounter2 *int, attributes_must []string){
 	entries := strings.Split(stringBuffer.String(), " ")
 	requiredCountPart1 := 0
 	requiredCountPart2 := 0
-	for i := 0; i < len(entries) - 1; i++ {
-		pair := strings.Split(entries[i], ":")
+	for i := 0; i < len(entries) - 1; i++ { // Ignore the last empty entry
+		pair := strings.Split(entries[i], ":") // [key, value]
 		if contains(pair[0], attributes_must) {
 			requiredCountPart1++
 			if validateParameters(pair[0], pair[1]) {
@@ -77,49 +77,30 @@ func contains(item string, array []string) bool{
 	return false
 }
 
+func validateNumbers(str string, low, high int) bool{
+	if len(str) != 4 {
+		return false
+	}
+	value, err := strconv.Atoi(str)
+	if err != nil {
+		panic(err)
+	}
+
+	if value < low || value > high {
+		return false
+	}
+	return true
+}
+
 func validateParameters(key, value string) bool {
 	switch key {
 	case "byr":
-		if len(value) != 4 {
-			return false
-		}
-		year, err := strconv.Atoi(value)
-		if err != nil {
-			panic(err)
-		}
-
-		if year < 1920 || year > 2002 {
-			return false
-		}
-		return true
+		return validateNumbers(value, 1920, 2002)
 	case "iyr":
-		if len(value) != 4 {
-			return false
-		}
-		year, err := strconv.Atoi(value)
-		if err != nil {
-			panic(err)
-		}
-
-		if year < 2010 || year > 2020 {
-			return false
-		}
-		return true
+		return validateNumbers(value, 2010, 2020)
 	case "eyr":
-		if len(value) != 4 {
-			return false
-		}
-		year, err := strconv.Atoi(value)
-		if err != nil {
-			panic(err)
-		}
-
-		if year < 2020 || year > 2030 {
-			return false
-		}
-		return true
+		return validateNumbers(value, 2020, 2030)
 	case "hgt":
-
 		if strings.Contains(value, "cm"){
 			value := strings.TrimRight(value,"cm")
 			height, err := strconv.Atoi(value)
@@ -146,25 +127,22 @@ func validateParameters(key, value string) bool {
 		}
 		return false
 	case "hcl":
-
 		if len(value) != 7 || value[0] != '#' {
 			return false
 		}
 
 		characters := strings.TrimPrefix(value, "#")
-		valid := true
 		for _, ch := range characters {
 			if unicode.IsNumber(ch) {
 				continue
 			}
 			if unicode.IsLetter(ch) {
 				if ch < 'a' || ch > 'f' {
-					valid = false
-					break
+					return false
 				}
 			}
 		}
-		return valid
+		return true
 	case "ecl":
 		must := []string {"amb", "blu", "brn", "gry", "grn", "hzl", "oth"}
 		return contains(value, must)
