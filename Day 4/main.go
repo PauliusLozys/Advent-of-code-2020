@@ -83,7 +83,7 @@ func validateNumbers(str string, low, high int) bool{
 	}
 	value, err := strconv.Atoi(str)
 	if err != nil {
-		panic(err)
+		return false
 	}
 
 	if value < low || value > high {
