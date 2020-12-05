@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 	"sort"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -20,29 +22,14 @@ func main() {
 	t := time.Now()
 	for file.Scan() {
 		code := file.Text()
-		start_row := 0
-		end_row := 127
-		for i := 0; i < 7; i++ {
-			if code[i] == 'F' { // Lower half
-				end_row = (end_row - start_row) / 2 + start_row
-			} else { // Upper half
-				start_row = end_row - (end_row - start_row) / 2
-			}
-		}
-		start_column := 0
-		end_column := 7
-		for i := 7; i < 10; i++ {
-			if code[i] == 'L' { // Lower half
-				end_column = (end_column - start_column) / 2 + start_column
-			} else { // Upper half
-				start_column = end_column - (end_column - start_column) / 2
-			}
-		}
 
-		ID := start_row * 8 + start_column
-		id_array = append(id_array, ID)
+		code = strings.ReplaceAll(code, "F", "0")
+		code = strings.ReplaceAll(code, "L", "0")
+		code = strings.ReplaceAll(code, "B", "1")
+		code = strings.ReplaceAll(code, "R", "1")
+		ID, _ := strconv.ParseInt(code, 2, 32)
+		id_array = append(id_array, int(ID))
 	}
-
 	sort.Ints(id_array)
 	fmt.Println("Part 1 answer:", id_array[len(id_array)-1])
 	for i := 0; i < len(id_array) - 1; i++ {
