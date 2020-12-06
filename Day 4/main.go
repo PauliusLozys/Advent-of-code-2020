@@ -42,8 +42,8 @@ func main() {
 		stringBuffer.Reset()
 	}
 
-	fmt.Println("Part 1 valid password count:",validPassportsPart1)
-	fmt.Println("Part 2 valid password count:",validPassportsPart2)
+	fmt.Println("Part 1 valid passport count:",validPassportsPart1)
+	fmt.Println("Part 2 valid passport count:",validPassportsPart2)
 	fmt.Println("Time taken:", time.Now().Sub(t))
 }
 
