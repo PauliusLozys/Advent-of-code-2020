@@ -18,6 +18,7 @@ func main() {
 	file := bufio.NewScanner(f)
 	preamble := 25
 	numbers := make([]int, preamble)
+	tmpCopy := make([]int, preamble) // Temporary dummy array for shifting "numbers" array to the left
 	allNumbers := []int{}
 	for file.Scan() {
 		num := file.Text()
@@ -31,44 +32,44 @@ func main() {
 	numbers = allNumbers[:25]
 	t := time.Now()
 	for i := preamble; i < len(allNumbers);i++ {
-
 		num := allNumbers[i]
-		if !checkIfValid(num, numbers){
+		if !checkIfValid(&num, numbers){
 			fmt.Println("Part 1 answer:", num)
 			invalidNumber = num
 			break
 		}
-		tmp := make([]int, len(numbers))
-		for j:=0; j < len(numbers) - 1; j++ {
-			tmp[j] = numbers[j+1]
+		for j:=0; j < preamble - 1; j++ { // Shifting the array to the left
+			tmpCopy[j] = numbers[j+1]
 		}
-		numbers = tmp
-		numbers[len(numbers) - 1] = num
+		numbers = tmpCopy
+		numbers[preamble - 1] = num
 	}
-	for i := 0; i < len(allNumbers) - 1;i++ {
-		total := allNumbers[i]
-		for j := i + 1; j < len(allNumbers);j++ {
+	i, j := 0, 1
+	total := allNumbers[i] + allNumbers[j]
+	for total != invalidNumber {
+		if total < invalidNumber{
+			j++
 			total += allNumbers[j]
-			if total == invalidNumber{
-				tmp := allNumbers[i:j]
-				sort.Ints(tmp)
-				sum := tmp[0] + tmp[len(tmp)-1]
-				fmt.Println("Part 2 answer:", sum)
-				i = len(allNumbers)
-				j = len(allNumbers)
-			} else if total > invalidNumber { // Invalid set found, check next
-				break
+		} else {
+			total -= allNumbers[i]
+			i++
+			if i == j { // If the first index catches up to the last, we move it
+				j++
+				total += allNumbers[j]
 			}
 		}
 	}
+	tmp := allNumbers[i:j]
+	sort.Ints(tmp)
+	sum := tmp[0] + tmp[len(tmp)-1]
+	fmt.Println("Part 2 answer:", sum)
 	fmt.Println("Time taken:", time.Now().Sub(t))
 }
-
-func checkIfValid(number int, numbersToCheckWith []int) bool{
+func checkIfValid(number *int, numbersToCheckWith []int) bool{
 	length := len(numbersToCheckWith)
 	for i := 0; i < length - 1; i++{
 		for j := i + 1; j < length; j++ {
-			if number == numbersToCheckWith[i] + numbersToCheckWith[j] {
+			if *number == numbersToCheckWith[i] + numbersToCheckWith[j] {
 				return true
 			}
 		}
