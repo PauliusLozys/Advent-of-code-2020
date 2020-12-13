@@ -6,11 +6,14 @@ import (
 	"math"
 	"os"
 	"strconv"
+	"time"
 )
 
 func main() {
+	t := time.Now()
 	Part1()
 	Part2()
+	fmt.Println("Time taken:",time.Now().Sub(t))
 }
 func Abs(number int) int {
 	if number < 0 {
