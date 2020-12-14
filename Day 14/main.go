@@ -74,10 +74,10 @@ func part2(file *bufio.Scanner, hash *hashmap.Map) {
 	}
 	fmt.Println("Part 2 answer:", total)
 }
-func recursiveAdd(index int, indexmask string, hash *hashmap.Map, value *int) {
+func recursiveAdd(index int, indexmask []byte, hash *hashmap.Map, value *int) {
 	if index >= len(indexmask) {
 		// Need to convert and add to hashmap
-		result, err := strconv.ParseInt(indexmask, 2, 64)
+		result, err := strconv.ParseInt(string(indexmask), 2, 64)
 		if err != nil {
 			panic(err)
 		}
@@ -88,20 +88,16 @@ func recursiveAdd(index int, indexmask string, hash *hashmap.Map, value *int) {
 	if indexmask[index] != 'X' {
 		recursiveAdd(index+1, indexmask, hash, value)
 	} else {
-
-		tmp1 := []rune(indexmask)
-		tmp1[index] = '0'
-		indexmask = string(tmp1)
+		indexmask[index] = 48 // 0
 		recursiveAdd(index+1, indexmask, hash, value)
 
-		tmp2 := []rune(indexmask)
-		tmp2[index] = '1'
-		indexmask = string(tmp2)
+		indexmask[index] = 49 // 1
 		recursiveAdd(index+1, indexmask, hash, value)
+		indexmask[index] = 'X' // Due to shared array we need to reset the floating point for the other combinations
 	}
 }
 
-func bitmaskPart2(value int, mask string) string {
+func bitmaskPart2(value int, mask string) []byte {
 	binary := strconv.FormatInt(int64(value), 2)
 	length := len(binary)
 	Buffer := bytes.Buffer{}
@@ -117,7 +113,7 @@ func bitmaskPart2(value int, mask string) string {
 			Buffer.WriteByte(workingMask[i])
 		}
 	}
-	return Buffer.String()
+	return Buffer.Bytes()
 }
 
 func bitmask (value int, mask string) int64 {
