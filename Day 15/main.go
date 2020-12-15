@@ -15,8 +15,6 @@ type Storage struct {
 
 func main() {
 
-	//Maxturns := 2020 // Part 1
-	Maxturns := 30000000 // Part 2
 	input := "12,1,16,3,11,0"
 	startingNum := strings.Split(input, ",")
 	hash := hashmap.New()
@@ -29,7 +27,7 @@ func main() {
 
 	turn := len(startingNum)
 	t := time.Now()
-	for turn != Maxturns {
+	for turn != 30000000 {
 		nextNumber := -1
 		tmp, _ := hash.Get(previousNumber)
 		val := tmp.(Storage)
@@ -57,7 +55,10 @@ func main() {
 		}
 		turn++
 		previousNumber = nextNumber
+		if turn == 2020 {
+			fmt.Println("Part 1 answer:", previousNumber)
+		}
 	}
-	fmt.Println("Answer:", previousNumber)
+	fmt.Println("Part 2 answer:", previousNumber)
 	fmt.Println("Time taken:", time.Now().Sub(t))
 }
