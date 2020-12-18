@@ -29,7 +29,6 @@ func main() {
 }
 
 func recursiveParse(line string) string {
-
 	tokens := parenthesesSplit(line)
 
 	if len(tokens) > 1 { // Contains "()"
@@ -41,8 +40,8 @@ func recursiveParse(line string) string {
 	}
 	
 	for idx, str := range tokens {
-		//t, f := tryEvaluate(str) // Part 1
-		t, f := tryEvaluateOrder(str) // Part 2
+		t, f := tryEvaluate(str) // Part 1
+		//t, f := tryEvaluateOrder(str) // Part 2
 		if f {
 			tokens[idx] = t
 		}
@@ -56,6 +55,9 @@ func recursiveParse(line string) string {
 	return fmt.Sprint(stringBuffer.String())
 }
 func tryEvaluate(str string) (string, bool) {
+	if str == ""{
+		return "", false
+	}
 	t := strings.Split(str, " ")
 	for i := 0; i < len(t) - 2; i+=2 {
 		n1, f := strconv.Atoi(t[i])
@@ -82,13 +84,13 @@ func tryEvaluateOrder(str string) (string, bool) {
 	buildEq := bytes.Buffer{}
 	for i := 0; i < len(t) - 2; i+=2 {
 		if 	t[i+1] == "+" {
-			n, f := tryEvaluate(t[i] + " + " + t[i+2])
-			if !f {
+			if n, f := tryEvaluate(t[i] + " + " + t[i+2]); f {
+				t[i+2] = n
+				t = append(t[:i], t[i+2:]...)
+				i = -2
+			} else {
 				return "", false
 			}
-			t[i+2] = n
-			t = append(t[:i], t[i+2:]...)
-			i = -2
 		}
 	}
 	for _, i := range t {
@@ -100,36 +102,29 @@ func tryEvaluateOrder(str string) (string, bool) {
 			}
 		}
 	}
-
-	rez := buildEq.String()
-	return tryEvaluate(rez)
+	return tryEvaluate(buildEq.String())
 }
 
 func parenthesesSplit(line string) []string {
 	tmp := []string{}
-	nesting := []int{}
+	nesting := 0
 	firstIndex := 0
 	for idx, ch := range line {
 
 		if ch == '(' {
-			nesting = append(nesting, 0)
-			if len(nesting) == 1 {
+			nesting += 1
+			if nesting == 1 {
 				tmp = append(tmp, line[firstIndex:idx])
 				firstIndex = idx
 			}
 		}
-
 		if ch == ')' {
-			if len(nesting) == 1 {
+			if nesting == 1 {
 				tmp = append(tmp, line[firstIndex+1: idx])
 				firstIndex = idx+1
-				nesting = nesting[:len(nesting)-1]
-			} else {
-				nesting = nesting[:len(nesting)-1]
 			}
+			nesting -= 1
 		}
-
-
 	}
 	if len(tmp) == 0 {
 		tmp = append(tmp, line)
